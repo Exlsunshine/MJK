@@ -21,13 +21,11 @@ public abstract class BaseFragment extends Fragment implements BadgeFragmenyList
 
 	@Override
 	public void onAttach(Activity activity) {
-		// TODO Auto-generated method stub
 		super.onAttach(activity);
 	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
 	}
 
@@ -68,42 +66,35 @@ public abstract class BaseFragment extends Fragment implements BadgeFragmenyList
 		}
 	}*/
 	public void onDetach() {
-		// TODO Auto-generated method stub
 		super.onDetach();
 	}
 
 	@Override
 	public void onResume() {
-		// TODO Auto-generated method stub
 		super.onResume();
 	}
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		// TODO Auto-generated method stub
 		super.onSaveInstanceState(outState);
 	}
 
 	@Override
 	public void onStart() {
-		// TODO Auto-generated method stub
 		super.onStart();
 	}
 
 	@Override
 	public void onStop() {
-		// TODO Auto-generated method stub
 		super.onStop();
 	}
 	protected abstract View onChildCreateView(LayoutInflater inflater,
 			ViewGroup container, Bundle savedInstanceState);
 	
 	public void copy(BaseFragment baseFragment){
-		//子类实现
 	}
 	
 	public void updateView(){
-		//子类实现
 	}
 	
 	public void disappear(){

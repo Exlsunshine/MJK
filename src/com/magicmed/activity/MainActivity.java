@@ -1,8 +1,5 @@
 package com.magicmed.activity;
 
-import com.example.hjrj.R;
-import com.magicmed.trend.FragmentTrend;
-
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -10,10 +7,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.Window;
 
+import com.example.hjrj.R;
+import com.magicmed.trend.FragmentTrend;
+
 public class MainActivity extends FragmentActivity
 {
 	private FragmentManager _manager;
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState)
 	{
