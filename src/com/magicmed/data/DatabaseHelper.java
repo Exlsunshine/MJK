@@ -42,13 +42,6 @@ public class DatabaseHelper {
         SQLiteDatabase db = DataBaseImpl.getDatabase().getDb();
         User user = new User();
         String[] args = {String.valueOf(user.get_user_id())};
-   /*     Cursor cursor;
-        String sql = "select * from " + DataBaseImpl.TABLE_MAGICMED_DATA + " ";
-        cursor = db.rawQuery(sql , new String[]{});
-
-        String[] args={String.valueOf(cursor.getCount())};
-       // String[] args={String.valueOf(data_id)};
-        db.delete(DataBaseImpl.TABLE_MAGICMED_DATA,"id=?",args);*/
         db.delete(DataBaseImpl.TABLE_MAGICMED_DATA,"user_id=?",args);
     }
 
