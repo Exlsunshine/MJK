@@ -5,5 +5,7 @@
 	<classpathentry exported="true" kind="con" path="com.android.ide.eclipse.adt.DEPENDENCIES"/>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="gen"/>
+	<classpathentry kind="lib" path="libs/magic_client_api_20150614-v0.4.jar"/>
+	<classpathentry kind="lib" path="libs/java-json.jar.zip"/>
 	<classpathentry kind="output" path="bin/classes"/>
 </classpath>
