@@ -9,21 +9,28 @@
         android:layout_height="wrap_content"
         android:background="#CFCFCF" >
 
-        <ImageView
-            android:id="@+id/frg_actionbar_back"
+        <LinearLayout
+            android:id="@+id/frg_actionbar_up"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:background="@drawable/ic_menu_back" />
+            android:clickable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" >
 
-        <Button
-            android:id="@+id/frg_actionbar_mainpage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_toRightOf="@+id/frg_actionbar_back"
-            android:background="@android:color/transparent"
-            android:text="主页" />
+            <ImageView
+                android:id="@+id/frg_actionbar_back"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/ic_menu_back" />
+
+            <Button
+                android:id="@+id/frg_actionbar_mainpage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@android:color/transparent"
+                android:text="主页" />
+        </LinearLayout>
 
         <TextView
             android:layout_width="wrap_content"
@@ -52,10 +59,11 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#CFCFCF"
-        android:orientation="horizontal" >
+        android:orientation="horizontal" 
+        android:background="@android:color/white">
 
         <TextView
+            android:id="@+id/frg_object_blood_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -66,6 +74,7 @@
             android:textSize="20sp" />
 
         <TextView
+            android:id="@+id/frg_object_heart_rate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -76,6 +85,7 @@
             android:textSize="20sp" />
 
         <TextView
+            android:id="@+id/frg_object_oxygen"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
