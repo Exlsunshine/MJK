@@ -1,0 +1,15 @@
+TABLE_MAGICMED_DATA
+id         			INTEGER primary key autoincrement
+user_id      		INTEGER
+storage_path 		vchar(100)
+heart_rate   		INTEGER
+sys_bp       		INTEGER
+dia_bp       		INTEGER
+mean_bp      		INTEGER
+ABI          		INTEGER
+PWV          		INTEGER
+spo2         		INTEGER
+measure_begin_time	INTEGER
+post_id      		INTEGER
+measure_end_time	INTEGER
+type         		INTEGER
