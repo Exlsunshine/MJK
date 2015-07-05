@@ -1,5 +1,8 @@
 package com.magicmed.trend;
 
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -14,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.hjrj.R;
+import com.magicmed.data.DatabaseHelper;
+import com.magicmed.data.MagicMedRecord;
 import com.magicmed.fragment.BaseFragment;
 
 public class FragmentTrend extends BaseFragment implements OnClickListener
@@ -85,6 +90,26 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 			/*FragmentUtils util = new FragmentUtils();
 			util.switchContent(FragmentTrend.this, new FragmentHeartRate(), getFragmentManager());
 			*/
+			
+			
+			MagicMedRecord record = new MagicMedRecord();
+			record.set_bp(1, 2, 3);
+			record.set_heart_rate(100);
+			record.set_spo2(80);
+			DatabaseHelper.getDatabaseHelper().InserData(record);
+			
+			ArrayList<MagicMedRecord> list = DatabaseHelper.getDatabaseHelper().getAllData();
+			for (int i = 0; i < list.size(); i++)
+			{
+				Log.i(DEBUG_TAG, "==========" + (i + 1) + "=========");
+				Log.i(DEBUG_TAG, "Mean bp:\t" + list.get(i).get_mean_bp());
+				Log.i(DEBUG_TAG, "Heart rate:\t" + list.get(i).get_heart_rate());
+				Log.i(DEBUG_TAG, "Oxygen:\t" + list.get(i).get_spo2());
+			}
+			
+			
+			
+			
 			
 			break;
 		case R.id.frg_date_selection_day:
