@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.magicmed.activity.MagicMedApplication;
+import com.magicmed.activity.MainActivity;
 
 public class DataBaseImpl extends SQLiteOpenHelper {
 
@@ -29,7 +30,7 @@ public class DataBaseImpl extends SQLiteOpenHelper {
 
 	public static DataBaseImpl getDatabase() {
 		if (_impl == null) {
-			_impl = new DataBaseImpl(MagicMedApplication.getInstance());
+			_impl = new DataBaseImpl(MainActivity.context/*MagicMedApplication.getInstance()*/);
 		}
 		return _impl;
 	}
