@@ -71,7 +71,8 @@
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
             android:text="血压"
-            android:textSize="20sp" />
+            android:textSize="20sp" 
+            android:background="#CFCFCF"/>
 
         <TextView
             android:id="@+id/frg_object_heart_rate"
