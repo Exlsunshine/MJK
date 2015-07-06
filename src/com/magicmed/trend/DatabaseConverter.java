@@ -406,7 +406,7 @@ public class DatabaseConverter
 	 * @param milliseconds
 	 * @return human readable format date.
 	 */
-	public static String millisecondsToDate(long milliseconds)
+	private String millisecondsToDate(long milliseconds)
 	{
 		GregorianCalendar.getInstance().setTimeInMillis(milliseconds);
 		Calendar calendar =  GregorianCalendar.getInstance();
