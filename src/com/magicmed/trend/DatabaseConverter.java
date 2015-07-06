@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 
@@ -15,20 +14,19 @@ import org.json.JSONObject;
 import android.annotation.SuppressLint;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.os.Environment;
 import android.util.Log;
 
 import com.magicmed.data.MagicMedRecord;
 import com.magicmed.data.MagicMedRecordBuilder;
 import com.magicmed.db.DataBaseImpl;
 
-@SuppressLint("DefaultLocale")
+@SuppressLint({ "DefaultLocale", "SdCardPath" })
 public class DatabaseConverter
 {
-	private static final String BASE_DIRECTORY = Environment.getExternalStorageDirectory().getAbsolutePath() + "/Maijike/";
-	private static final String DAY_OF_MONTH_HISTORY_RECORDS_CACHE_DIR = BASE_DIRECTORY + "/trend/day.dat";
-	private static final String MONTH_HISTORY_RECORDS_CACHE_DIR = BASE_DIRECTORY + "/trend/month.dat";
-	private static final String YEAR_HISTORY_RECORDS_CACHE_DIR = BASE_DIRECTORY + "/trend/year.dat";
+	private static final String BASE_DIRECTORY = "/mnt/sdcard/";
+	private static final String DAY_OF_MONTH_HISTORY_RECORDS_CACHE_DIR = BASE_DIRECTORY + "trend/day.dat";
+	private static final String MONTH_HISTORY_RECORDS_CACHE_DIR = BASE_DIRECTORY + "trend/month.dat";
+	private static final String YEAR_HISTORY_RECORDS_CACHE_DIR = BASE_DIRECTORY + "trend/year.dat";
 	private static final String DEBUG_TAG = "______DatabaseConverter";
 	private static DatabaseConverter databaseConverter = null;
 	
@@ -49,7 +47,7 @@ public class DatabaseConverter
 			long lowerBoundTime = getLowerBoundTime(statisticType, dateInfo);
 			long upperBoundTime = getUpperBoundTime(statisticType, dateInfo);
 			ArrayList<MagicMedRecord> records = retriveData(lowerBoundTime, upperBoundTime);
-			processAggregation(statisticObject, statisticType, records);
+			processAggregation(statisticObject, statisticType, records, callback);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -60,8 +58,6 @@ public class DatabaseConverter
 		try 
 		{
             File file = new File(filePath);
-            file.getParentFile().mkdirs();
-            file.createNewFile();
             FileOutputStream out = new FileOutputStream(file);
             OutputStreamWriter writer = new OutputStreamWriter(out);
             
@@ -75,18 +71,21 @@ public class DatabaseConverter
         }
 	}
 	
-	private void processAggregation(int statisticObject, int statisticType, ArrayList<MagicMedRecord> records)
+	private void processAggregation(int statisticObject, int statisticType, ArrayList<MagicMedRecord> records, RetriveDataListener callback)
 	{
 		switch (statisticType)
 		{
 		case StatisticType.STATISTIC_BY_DAY:
 			SaveDataToFile(DAY_OF_MONTH_HISTORY_RECORDS_CACHE_DIR, aggregateByDay(statisticObject, records));
+			callback.onFinishRetrivingData(DAY_OF_MONTH_HISTORY_RECORDS_CACHE_DIR);
 			break;
 		case StatisticType.STATISTIC_BY_MONTH:
 			SaveDataToFile(MONTH_HISTORY_RECORDS_CACHE_DIR, aggregateByMonth(statisticObject, records));
+			callback.onFinishRetrivingData(MONTH_HISTORY_RECORDS_CACHE_DIR);
 			break;
 		case StatisticType.STATISTIC_BY_YEAR:
 			SaveDataToFile(YEAR_HISTORY_RECORDS_CACHE_DIR, aggregateByYear(statisticObject, records));
+			callback.onFinishRetrivingData(YEAR_HISTORY_RECORDS_CACHE_DIR);
 			break;
 		default:
 			break;
@@ -138,11 +137,22 @@ public class DatabaseConverter
 		return value;
 	}
 	
+	/**
+	 * Add a leading zero if the number <= 10, otherwise do nothing.
+	 * @param number
+	 * @return Result after adding leading zero(If it's necessary).
+	 */
 	private String addPadding(int number)
 	{
 		return number >= 10 ? String.valueOf(number) : "0" + String.valueOf(number);
 	}
 	
+	/**
+	 * Aggregate month by month.
+	 * @param statisticObject
+	 * @param records
+	 * @return Result of aggregate.
+	 */
 	@SuppressLint("UseSparseArrays")
 	private ArrayList<String> aggregateByMonth(int statisticObject, ArrayList<MagicMedRecord> records)
 	{
@@ -154,6 +164,12 @@ public class DatabaseConverter
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(records.get(i).get_measure_begin_time());
 			int month = calendar.get(Calendar.MONTH);
+			/**
+			 * Important!!!
+			 * If the given month is December, then Java saved it as "zero" NOT "12",
+			 * so we have to manually make month equal to 12 when the month is 0.
+			 */
+			month = month == 0 ? 12 : month;
 			
 			int value = getObjectValue(statisticObject, records.get(i));
 			if (map.containsKey(month))
@@ -171,6 +187,11 @@ public class DatabaseConverter
 		return recordsData;
 	}
 	
+	/**
+	 * For aggregation use.
+	 * @author EXLsunshine
+	 *
+	 */
 	private class AssistStatisticCounter
 	{
 		private int key;
@@ -217,6 +238,13 @@ public class DatabaseConverter
 		
 	}
 	
+	
+	/**
+	 * Aggregate records year by year.
+	 * @param statisticObject
+	 * @param records
+	 * @return Result of aggregate.
+	 */
 	@SuppressLint("UseSparseArrays")
 	private ArrayList<String> aggregateByYear(int statisticObject, ArrayList<MagicMedRecord> records)
 	{
@@ -260,9 +288,11 @@ public class DatabaseConverter
 	    try 
 	    {
 	        String sql = "select * from " + DataBaseImpl.TABLE_MAGICMED_DATA + " "
-	        		+ "where measure_begin_time >= ? and measure_begin_time <= ?";
-	        cursor = db.rawQuery(sql, 
-	        		new String[] {String.valueOf(lowerBoundTime), String.valueOf(upperBoundTime)});
+	        		+ "where measure_begin_time >= ? and measure_begin_time < ?";
+	        cursor = db.rawQuery(sql, new String[] {String.valueOf(lowerBoundTime),
+	        		String.valueOf(upperBoundTime)});
+	        
+	        Log.d(DEBUG_TAG, "Got " + cursor.getCount() + " results from database.");
 	        while (cursor.moveToNext()) 
 	        {
 	            MagicMedRecordBuilder builder = new MagicMedRecordBuilder();
@@ -278,6 +308,7 @@ public class DatabaseConverter
 	    
 	    return list;
 	}
+ 	
 	
 	/**
 	 * Get the upper bound time of the statistic data
@@ -296,31 +327,25 @@ public class DatabaseConverter
 		case StatisticType.STATISTIC_BY_DAY:
 			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
 					(Integer)dateInfo.get(StatisticDateTime.MONTH),
-					(Integer)dateInfo.get(StatisticDateTime.DAY_OF_MONTH),
-					23, 59, 59);
+					(Integer)dateInfo.get(StatisticDateTime.DAY_OF_MONTH), 23, 59, 59);
 			break;
 		case StatisticType.STATISTIC_BY_MONTH:
-			//I have to get the maximum days in a given month
-			int year = (Integer)dateInfo.get(StatisticDateTime.YEAR);
-			int month = (Integer)dateInfo.get(StatisticDateTime.MONTH);
-			int day = 1;
-			Calendar calendar = new GregorianCalendar(year, month, day);
-
-			upperBound = dateToMilLiseconds(year, month, 
-					calendar.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59);
+			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) + 1, 
+					1, 1, 0, 0, 0);
 			break;
 		case StatisticType.STATISTIC_BY_YEAR:
-			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
-					12, 31, 23, 59, 59);
+			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) + 5,
+					1, 1, 0, 0, 0);
 			break;
 		default:
 			upperBound = -1;
 			break;
 		}
 		
-		Log.i(DEBUG_TAG, "Got upper bound time.");
+		Log.i(DEBUG_TAG, "Got upper bound time." + upperBound + " " + millisecondsToDate(upperBound));
 		return upperBound;
 	}
+	
 	
 	/**
 	 * Get the lower bound time of the statistic data
@@ -339,16 +364,14 @@ public class DatabaseConverter
 		case StatisticType.STATISTIC_BY_DAY:
 			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
 					(Integer)dateInfo.get(StatisticDateTime.MONTH),
-					(Integer)dateInfo.get(StatisticDateTime.DAY_OF_MONTH),
-					0, 0, 0);
+					(Integer)dateInfo.get(StatisticDateTime.DAY_OF_MONTH), 0, 0, 0);
 			break;
 		case StatisticType.STATISTIC_BY_MONTH:
 			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
-					(Integer)dateInfo.get(StatisticDateTime.MONTH),
-					1, 0, 0, 0);
+					1, 1, 0, 0, 0);
 			break;
 		case StatisticType.STATISTIC_BY_YEAR:
-			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
+			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) - 5,
 					1, 1, 0, 0, 0);
 			break;
 		default:
@@ -356,9 +379,10 @@ public class DatabaseConverter
 			break;
 		}
 
-		Log.i(DEBUG_TAG, "Got lower bound time.");
+		Log.i(DEBUG_TAG, "Got lower bound time." + lowerBound + " " + millisecondsToDate(lowerBound));
 		return lowerBound;
 	}
+	
 	
 	/**
 	 * Convert date to milliseconds format
@@ -372,8 +396,28 @@ public class DatabaseConverter
 	 */
 	private long dateToMilLiseconds(int year, int month, int dayOfMonth, int hour, int minute, int second)
 	{
-		@SuppressWarnings("deprecation")
-		Date date = new Date(year, month, dayOfMonth, hour, minute, second);
-		return date.getTime();
+		GregorianCalendar date = new GregorianCalendar(year, month, dayOfMonth, hour, minute, second);
+		return date.getTimeInMillis();
+	}
+	
+	
+	/**
+	 * Convert milliseconds to human readable format.
+	 * @param milliseconds
+	 * @return human readable format date.
+	 */
+	public static String millisecondsToDate(long milliseconds)
+	{
+		GregorianCalendar.getInstance().setTimeInMillis(milliseconds);
+		Calendar calendar =  GregorianCalendar.getInstance();
+		calendar.setTimeInMillis(milliseconds);
+		int year = calendar.get(Calendar.YEAR);
+		int month = calendar.get(Calendar.MONTH);
+		int dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+		int hour = calendar.get(Calendar.HOUR_OF_DAY);
+		int minute = calendar.get(Calendar.MINUTE);
+		int second = calendar.get(Calendar.SECOND);
+		
+		return String.format("%d-%d-%d\t%d:%d:%d", year, month == 0 ? 12 : month, dayOfMonth, hour, minute, second);
 	}
 }
