@@ -1,8 +1,5 @@
 package com.magicmed.trend;
 
-import java.lang.reflect.Array;
-import java.util.ArrayList;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -17,8 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.hjrj.R;
-import com.magicmed.data.DatabaseHelper;
-import com.magicmed.data.MagicMedRecord;
 import com.magicmed.fragment.BaseFragment;
 
 public class FragmentTrend extends BaseFragment implements OnClickListener
@@ -87,25 +82,52 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		{
 		case R.id.frg_actionbar_up:
 			Log.i(DEBUG_TAG, "Back to home.");
-			/*FragmentUtils util = new FragmentUtils();
-			util.switchContent(FragmentTrend.this, new FragmentHeartRate(), getFragmentManager());
+			/*
+			//Insert fake date to database.
+			ArrayList<MagicMedRecord> records = GenerateFakeData.MakeData();
+			for (int i = 0; i < records.size(); i++)
+			{
+				Log.d(DEBUG_TAG, "==============" + (i + 1) + "==============");
+				Log.d(DEBUG_TAG, "Blood pressure\t" + records.get(i).get_mean_bp());
+				Log.d(DEBUG_TAG, "Heart rate\t" + records.get(i).get_heart_rate());
+				Log.d(DEBUG_TAG, "Oxygen\t" + records.get(i).get_spo2());
+				Log.d(DEBUG_TAG, "Date\t" + DatabaseConverter.millisecondsToDate(records.get(i).get_measure_begin_time()));
+				DatabaseHelper.getDatabaseHelper().InserData(records.get(i));
+			}
+			Log.d(DEBUG_TAG, "Total\t" + records.size());
 			*/
 			
-			
-			MagicMedRecord record = new MagicMedRecord();
-			record.set_bp(1, 2, 3);
-			record.set_heart_rate(100);
-			record.set_spo2(80);
-			DatabaseHelper.getDatabaseHelper().InserData(record);
-			
-			ArrayList<MagicMedRecord> list = DatabaseHelper.getDatabaseHelper().getAllData();
-			for (int i = 0; i < list.size(); i++)
+			try 
 			{
-				Log.i(DEBUG_TAG, "==========" + (i + 1) + "=========");
-				Log.i(DEBUG_TAG, "Mean bp:\t" + list.get(i).get_mean_bp());
-				Log.i(DEBUG_TAG, "Heart rate:\t" + list.get(i).get_heart_rate());
-				Log.i(DEBUG_TAG, "Oxygen:\t" + list.get(i).get_spo2());
+				JSONObject date = new JSONObject();
+				date.put(StatisticDateTime.YEAR, 2011);
+				date.put(StatisticDateTime.MONTH, 3);
+				date.put(StatisticDateTime.DAY_OF_MONTH, 14);
+				
+				DatabaseConverter.getInstance().getDataFromDB(StatisticObject.STATISTIC_BY_BLOOD_PRESURE, 
+						StatisticType.STATISTIC_BY_YEAR, date, new RetriveDataListener() 
+				{
+					@Override
+					public void onFinishRetrivingData(String filePath)
+					{
+						Log.i(DEBUG_TAG, "Got it." + filePath);
+					}
+				});
+			} catch (JSONException e1) {
+				e1.printStackTrace();
 			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			
 			
 			
