@@ -1,7 +1,8 @@
 package com.magicmed.trend;
 
 /**
- * Set which object shall be shown in the chart.
+ * Set which object shall be shown in the chart.<br>
+ * <b>{@link #STATISTIC_BY_BLOOD_PRESURE}</b> will be applied by default.
  * @author EXLsunshine
  *
  */

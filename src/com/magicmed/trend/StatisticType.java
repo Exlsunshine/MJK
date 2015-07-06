@@ -1,7 +1,8 @@
 package com.magicmed.trend;
 
 /**
- * Set which type of the time unit should be used for the chart.  
+ * Set which type of the time unit should be used for the chart.<br>
+ * <b>{@link #STATISTIC_BY_DAY}</b> will be applied by default.
  * @author EXLsunshine
  *
  */
