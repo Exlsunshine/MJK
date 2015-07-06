@@ -116,90 +116,106 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 			} catch (JSONException e1) {
 				e1.printStackTrace();
 			}
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
 			break;
+		
 		case R.id.frg_date_selection_day:
-			Log.i(DEBUG_TAG, "Select day.");
-			statisticType.setStatisticType(StatisticType.STATISTIC_BY_DAY);
-			
-			statisticByDay.setBackgroundColor(Color.LTGRAY);
-			statisticByMonth.setBackgroundColor(Color.WHITE);
-			statisticByYear.setBackgroundColor(Color.WHITE);
-			
-			JSONObject jsonObj = new JSONObject();
-			try {
-				jsonObj.put(StatisticDateTime.YEAR, 2015);
-				jsonObj.put(StatisticDateTime.MONTH, 06);
-				jsonObj.put(StatisticDateTime.DAY_OF_MONTH, 17);
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-			
-			DatabaseConverter.getInstance().getDataFromDB(1, 1, jsonObj, new RetriveDataListener()
-			{
-				@Override
-				public void onFinishRetrivingData(String filePath) 
-				{
-					System.out.println("Got data.");
-				}
-			});
-			
+			onDaySelect();
 			break;
 		case R.id.frg_date_selection_month:
-			Log.i(DEBUG_TAG, "Select month.");
-			statisticType.setStatisticType(StatisticType.STATISTIC_BY_MONTH);
-
-			statisticByDay.setBackgroundColor(Color.WHITE);
-			statisticByMonth.setBackgroundColor(Color.LTGRAY);
-			statisticByYear.setBackgroundColor(Color.WHITE);
+			onMonthSelect();
 			break;
 		case R.id.frg_date_selection_year:
-			Log.i(DEBUG_TAG, "Select year.");
-			statisticType.setStatisticType(StatisticType.STATISTIC_BY_YEAR);
-			
-			statisticByDay.setBackgroundColor(Color.WHITE);
-			statisticByMonth.setBackgroundColor(Color.WHITE);
-			statisticByYear.setBackgroundColor(Color.LTGRAY);
+			onYearSelect();
 			break;
+		
 		case R.id.frg_object_blood_pressure:
-			statisticObject.setStatisticObject(StatisticObject.STATISTIC_BY_BLOOD_PRESURE);
-			
-			statisticByBloodPressure.setBackgroundColor(Color.LTGRAY);
-			statisticByHeartRate.setBackgroundColor(Color.WHITE);
-			statisticByOxygen.setBackgroundColor(Color.WHITE);
+			onBloodPressureSelect();
 			break;
 		case R.id.frg_object_heart_rate:
-			statisticObject.setStatisticObject(StatisticObject.STATISTIC_BY_HEART_RATE);
-			
-			statisticByBloodPressure.setBackgroundColor(Color.WHITE);
-			statisticByHeartRate.setBackgroundColor(Color.LTGRAY);
-			statisticByOxygen.setBackgroundColor(Color.WHITE);
+			onHeartRateSelect();
 			break;
 		case R.id.frg_object_oxygen:
-			statisticObject.setStatisticObject(StatisticObject.STATISTIC_BY_OXYGEN);
-
-			statisticByBloodPressure.setBackgroundColor(Color.WHITE);
-			statisticByHeartRate.setBackgroundColor(Color.WHITE);
-			statisticByOxygen.setBackgroundColor(Color.LTGRAY);
+			onOxygenSelect();
 			break;
 		default:
 			break;
 		}
+	}
+	
+	
+	public void onDaySelect()
+	{
+		Log.i(DEBUG_TAG, "Select day.");
+		statisticType.setStatisticType(StatisticType.STATISTIC_BY_DAY);
+		
+		statisticByDay.setBackgroundColor(Color.LTGRAY);
+		statisticByMonth.setBackgroundColor(Color.WHITE);
+		statisticByYear.setBackgroundColor(Color.WHITE);
+		
+		JSONObject jsonObj = new JSONObject();
+		try
+		{
+			jsonObj.put(StatisticDateTime.YEAR, 2015);
+			jsonObj.put(StatisticDateTime.MONTH, 06);
+			jsonObj.put(StatisticDateTime.DAY_OF_MONTH, 17);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		DatabaseConverter.getInstance().getDataFromDB(1, 1, jsonObj, new RetriveDataListener()
+		{
+			@Override
+			public void onFinishRetrivingData(String filePath) 
+			{
+				System.out.println("Got data.");
+			}
+		});
+	}
+	
+	public void onMonthSelect()
+	{
+		Log.i(DEBUG_TAG, "Select month.");
+		statisticType.setStatisticType(StatisticType.STATISTIC_BY_MONTH);
+
+		statisticByDay.setBackgroundColor(Color.WHITE);
+		statisticByMonth.setBackgroundColor(Color.LTGRAY);
+		statisticByYear.setBackgroundColor(Color.WHITE);
+	}
+	
+	public void onYearSelect()
+	{
+		Log.i(DEBUG_TAG, "Select year.");
+		statisticType.setStatisticType(StatisticType.STATISTIC_BY_YEAR);
+		
+		statisticByDay.setBackgroundColor(Color.WHITE);
+		statisticByMonth.setBackgroundColor(Color.WHITE);
+		statisticByYear.setBackgroundColor(Color.LTGRAY);
+	}
+	
+	public void onBloodPressureSelect()
+	{
+		statisticObject.setStatisticObject(StatisticObject.STATISTIC_BY_BLOOD_PRESURE);
+		
+		statisticByBloodPressure.setBackgroundColor(Color.LTGRAY);
+		statisticByHeartRate.setBackgroundColor(Color.WHITE);
+		statisticByOxygen.setBackgroundColor(Color.WHITE);
+	}
+	
+	public void onHeartRateSelect()
+	{
+		statisticObject.setStatisticObject(StatisticObject.STATISTIC_BY_HEART_RATE);
+		
+		statisticByBloodPressure.setBackgroundColor(Color.WHITE);
+		statisticByHeartRate.setBackgroundColor(Color.LTGRAY);
+		statisticByOxygen.setBackgroundColor(Color.WHITE);
+	}
+	
+	public void onOxygenSelect()
+	{
+		statisticObject.setStatisticObject(StatisticObject.STATISTIC_BY_OXYGEN);
+
+		statisticByBloodPressure.setBackgroundColor(Color.WHITE);
+		statisticByHeartRate.setBackgroundColor(Color.WHITE);
+		statisticByOxygen.setBackgroundColor(Color.LTGRAY);
 	}
 }
