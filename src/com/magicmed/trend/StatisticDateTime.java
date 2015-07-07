@@ -1,5 +1,7 @@
 package com.magicmed.trend;
 
+import java.util.Date;
+
 class StatisticDateTime
 {
 	public static final String YEAR = "FragmentTrend.year";
@@ -18,6 +20,18 @@ class StatisticDateTime
 		currentYear = year;
 		currentMonth = month;
 		currentDayOfMonth = dayOfMonth;
+	}
+	
+	/**
+	 * Initiate a StatisticDateTime with current system time.
+	 */
+	@SuppressWarnings("deprecation")
+	public StatisticDateTime()
+	{
+		Date date = new Date(System.currentTimeMillis());
+		currentYear = date.getYear() + 1900;
+		currentMonth = date.getMonth() + 1;
+		currentDayOfMonth = date.getDate();
 	}
 	
 	public void setYear(int year)
@@ -44,8 +58,28 @@ class StatisticDateTime
 	{
 		return currentMonth;
 	}
+	
 	public int getDayOfMonth()
 	{
 		return currentDayOfMonth;
+	}
+	
+	@SuppressWarnings("deprecation")
+	/**
+	 * Check whether the current selected date is today.
+	 * @return
+	 */
+	public boolean isToday()
+	{
+		Date date = new Date(System.currentTimeMillis());
+		return (currentYear == date.getYear() + 1900) &&
+			   (currentMonth == date.getMonth() + 1) &&
+			   (currentDayOfMonth == date.getDate());
+	}
+	
+	@Override
+	public String toString()
+	{
+		return currentYear + "-" + currentMonth + "-" + currentDayOfMonth;
 	}
 }
