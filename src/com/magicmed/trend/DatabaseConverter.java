@@ -168,7 +168,7 @@ public class DatabaseConverter
 			 * Java handle month with zero based value.
 			 * So Jan is 0, Feb is 1, ... Dec is 11
 			 */
-			int month = calendar.get(Calendar.MONTH) + 1;
+			//int month = calendar.get(Calendar.MONTH) + 1;
 			int day = calendar.get(Calendar.DAY_OF_MONTH);
 			
 			int value = getObjectValue(statisticObject, records.get(i));
@@ -255,13 +255,19 @@ public class DatabaseConverter
 		{
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(records.get(i).get_measure_begin_time());
-			int year = calendar.get(Calendar.YEAR);
+			//int year = calendar.get(Calendar.YEAR);
+			/**
+			 * Important!!!
+			 * Java handle month with zero based value.
+			 * So Jan is 0, Feb is 1, ... Dec is 11
+			 */
+			int month = calendar.get(Calendar.MONTH) + 1;
 			
 			int value = getObjectValue(statisticObject, records.get(i));
-			if (map.containsKey(year))
-				map.get(year).appendData(value);
+			if (map.containsKey(month))
+				map.get(month).appendData(value);
 			else
-				map.put(year, new AssistStatisticCounter(year, value));
+				map.put(month, new AssistStatisticCounter(month, value));
 		}
 		
 		for (int key : map.keySet())
@@ -341,8 +347,8 @@ public class DatabaseConverter
 					calendar.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59);
 			break;
 		case StatisticType.STATISTIC_BY_YEAR:
-			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) + 5,
-					1, 1, 0, 0, 0);
+			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
+					12, 31, 23, 59, 59);
 			break;
 		default:
 			upperBound = -1;
@@ -378,7 +384,7 @@ public class DatabaseConverter
 					(Integer)dateInfo.get(StatisticDateTime.MONTH), 1, 0, 0, 0);
 			break;
 		case StatisticType.STATISTIC_BY_YEAR:
-			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) - 5,
+			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
 					1, 1, 0, 0, 0);
 			break;
 		default:
