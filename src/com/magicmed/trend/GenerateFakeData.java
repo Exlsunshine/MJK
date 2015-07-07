@@ -41,7 +41,7 @@ public class GenerateFakeData
 
 	private static long dateToMilLiseconds(int year, int month, int dayOfMonth, int hour, int minute, int second)
 	{
-		GregorianCalendar date = new GregorianCalendar(year, month, dayOfMonth, hour, minute, second);
+		GregorianCalendar date = new GregorianCalendar(year, month - 1, dayOfMonth, hour, minute, second);
 		return date.getTimeInMillis();
 	}
 }
