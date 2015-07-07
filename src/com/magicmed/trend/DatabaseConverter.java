@@ -163,19 +163,19 @@ public class DatabaseConverter
 		{
 			Calendar calendar = Calendar.getInstance();
 			calendar.setTimeInMillis(records.get(i).get_measure_begin_time());
-			int month = calendar.get(Calendar.MONTH);
 			/**
 			 * Important!!!
-			 * If the given month is December, then Java saved it as "zero" NOT "12",
-			 * so we have to manually make month equal to 12 when the month is 0.
+			 * Java handle month with zero based value.
+			 * So Jan is 0, Feb is 1, ... Dec is 11
 			 */
-			month = month == 0 ? 12 : month;
+			int month = calendar.get(Calendar.MONTH) + 1;
+			int day = calendar.get(Calendar.DAY_OF_MONTH);
 			
 			int value = getObjectValue(statisticObject, records.get(i));
-			if (map.containsKey(month))
-				map.get(month).appendData(value);
+			if (map.containsKey(day))
+				map.get(day).appendData(value);
 			else
-				map.put(month, new AssistStatisticCounter(month, value));
+				map.put(day, new AssistStatisticCounter(day, value));
 		}
 		
 		for (int key : map.keySet())
@@ -298,6 +298,7 @@ public class DatabaseConverter
 	            MagicMedRecordBuilder builder = new MagicMedRecordBuilder();
 	            MagicMedRecord med = builder.build(cursor);
 	            list.add(med);
+	            Log.i(DEBUG_TAG, millisecondsToDate(med.get_measure_begin_time()));
 	        }
 	    } 
 	    finally
@@ -330,8 +331,14 @@ public class DatabaseConverter
 					(Integer)dateInfo.get(StatisticDateTime.DAY_OF_MONTH), 23, 59, 59);
 			break;
 		case StatisticType.STATISTIC_BY_MONTH:
-			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) + 1, 
-					1, 1, 0, 0, 0);
+			//I have to get the maximum days in a given month
+			int year = (Integer)dateInfo.get(StatisticDateTime.YEAR);
+			int month = (Integer)dateInfo.get(StatisticDateTime.MONTH);
+			int day = 1;
+			Calendar calendar = new GregorianCalendar(year, month, day);
+			
+			upperBound = dateToMilLiseconds(year, month, 
+					calendar.getActualMaximum(Calendar.DAY_OF_MONTH), 23, 59, 59);
 			break;
 		case StatisticType.STATISTIC_BY_YEAR:
 			upperBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) + 5,
@@ -368,7 +375,7 @@ public class DatabaseConverter
 			break;
 		case StatisticType.STATISTIC_BY_MONTH:
 			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR),
-					1, 1, 0, 0, 0);
+					(Integer)dateInfo.get(StatisticDateTime.MONTH), 1, 0, 0, 0);
 			break;
 		case StatisticType.STATISTIC_BY_YEAR:
 			lowerBound = dateToMilLiseconds((Integer)dateInfo.get(StatisticDateTime.YEAR) - 5,
@@ -387,7 +394,7 @@ public class DatabaseConverter
 	/**
 	 * Convert date to milliseconds format
 	 * @param year
-	 * @param month
+	 * @param month This month value parameter is <b>1-based!</b> Jan is 1 Feb is 2 and Dec is 12
 	 * @param dayOfMonth
 	 * @param hour
 	 * @param minute
@@ -396,7 +403,7 @@ public class DatabaseConverter
 	 */
 	private long dateToMilLiseconds(int year, int month, int dayOfMonth, int hour, int minute, int second)
 	{
-		GregorianCalendar date = new GregorianCalendar(year, month, dayOfMonth, hour, minute, second);
+		GregorianCalendar date = new GregorianCalendar(year, month - 1, dayOfMonth, hour, minute, second);
 		return date.getTimeInMillis();
 	}
 	
