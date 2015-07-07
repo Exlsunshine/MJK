@@ -59,20 +59,20 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal" 
-        android:background="@android:color/white">
+        android:background="@android:color/white"
+        android:orientation="horizontal" >
 
         <TextView
             android:id="@+id/frg_object_blood_pressure"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:background="#CFCFCF"
             android:gravity="center"
             android:paddingBottom="5dp"
             android:paddingTop="5dp"
             android:text="血压"
-            android:textSize="20sp" 
-            android:background="#CFCFCF"/>
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/frg_object_heart_rate"
@@ -110,6 +110,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@android:color/white"
         android:paddingBottom="5dp"
         android:paddingTop="5dp" >
 
@@ -155,7 +156,7 @@
     </RelativeLayout>
 
     <TextView
-        android:id="@+id/frg_date_selected"
+        android:id="@+id/frg_master_date"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -179,6 +180,7 @@
                 android:background="@drawable/ic_menu_back" />
 
             <TextView
+                android:id="@+id/frg_previous"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
@@ -187,6 +189,7 @@
         </LinearLayout>
 
         <TextView
+            android:id="@+id/frg_slave_date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerInParent="true"
@@ -207,6 +210,7 @@
                 android:background="@drawable/ic_menu_forward" />
 
             <TextView
+                android:id="@+id/frg_next"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
