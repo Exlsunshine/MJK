@@ -34,7 +34,6 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 	private TextView previous;
 	private TextView next;
 	
-	
 	private StatisticType statisticType;
 	private StatisticObject statisticObject;
 	private StatisticDateTime statisticDateTime;
@@ -98,6 +97,10 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		updateSelectDateUI();
 	}
 	
+	
+	/**
+	 * Update UI after user selects day/month/year button.
+	 */
 	@SuppressWarnings("deprecation")
 	private void updateSelectDateUI()
 	{
@@ -145,10 +148,12 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 	public void onClick(View arg0) 
 	{
 		int itemID = arg0.getId();
+		boolean isBackPressed = false;
 		
 		switch(itemID)
 		{
 		case R.id.frg_actionbar_up:
+			isBackPressed = true;
 			Log.i(DEBUG_TAG, "Back to home.");
 			/*
 			//Insert fake date to database.
@@ -165,7 +170,7 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 			Log.d(DEBUG_TAG, "Total\t" + records.size());
 			*/
 			
-			try 
+			/*try 
 			{
 				JSONObject date = new JSONObject();
 				date.put(StatisticDateTime.YEAR, 2011);
@@ -183,7 +188,7 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 				});
 			} catch (JSONException e1) {
 				e1.printStackTrace();
-			}
+			}*/
 			break;
 		
 		case R.id.frg_date_selection_day:
@@ -208,7 +213,6 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		case R.id.frg_object_oxygen:
 			onOxygenSelect();
 			break;
-			
 
 		case R.id.frg_previous:
 			updateSelectDate(-1);
@@ -220,6 +224,32 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 			break;
 		default:
 			break;
+		}
+		
+		if (!isBackPressed)
+			updateChart();
+	}
+	
+	private void updateChart()
+	{
+		try 
+		{
+			JSONObject date = new JSONObject();
+			date.put(StatisticDateTime.YEAR, statisticDateTime.getYear());
+			date.put(StatisticDateTime.MONTH, statisticDateTime.getMonth());
+			date.put(StatisticDateTime.DAY_OF_MONTH, statisticDateTime.getDayOfMonth());
+			
+			DatabaseConverter.getInstance().getDataFromDB(statisticObject.getStatisticObject(), 
+					statisticType.getStatisticType(), date, new RetriveDataListener() 
+			{
+				@Override
+				public void onFinishRetrivingData(String filePath)
+				{
+					Log.i(DEBUG_TAG, "Got it." + filePath);
+				}
+			});
+		} catch (JSONException e1) {
+			e1.printStackTrace();
 		}
 	}
 	
