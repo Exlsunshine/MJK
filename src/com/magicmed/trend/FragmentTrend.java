@@ -1,5 +1,7 @@
 package com.magicmed.trend;
 
+import java.util.Date;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -20,15 +22,22 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 {
 	private static final String DEBUG_TAG = "______FragmentTrend";
 	private LinearLayout up;
-	private TextView statisticByDay;
-	private TextView statisticByMonth;
-	private TextView statisticByYear;
 	private TextView statisticByBloodPressure;
 	private TextView statisticByHeartRate;
 	private TextView statisticByOxygen;
+	private TextView statisticByDay;
+	private TextView statisticByMonth;
+	private TextView statisticByYear;
+	
+	private TextView masterDate;
+	private TextView slaveDate;
+	private TextView previous;
+	private TextView next;
+	
 	
 	private StatisticType statisticType;
 	private StatisticObject statisticObject;
+	private StatisticDateTime statisticDateTime;
 	
 	@Override
 	protected View onChildCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) 
@@ -38,6 +47,7 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		setupLayouts(v);
 		setupListeners();
 		initVariables();
+		initUI();
 		return v;
 	}
 
@@ -52,6 +62,12 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		statisticByBloodPressure = (TextView) v.findViewById(R.id.frg_object_blood_pressure);
 		statisticByHeartRate = (TextView) v.findViewById(R.id.frg_object_heart_rate);
 		statisticByOxygen = (TextView) v.findViewById(R.id.frg_object_oxygen);
+		
+		masterDate = (TextView) v.findViewById(R.id.frg_master_date);
+		slaveDate = (TextView) v.findViewById(R.id.frg_slave_date);
+		
+		previous = (TextView) v.findViewById(R.id.frg_previous);
+		next = (TextView) v.findViewById(R.id.frg_next);
 	}
 	
 	private void setupListeners()
@@ -65,12 +81,64 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		statisticByBloodPressure.setOnClickListener(this);
 		statisticByHeartRate.setOnClickListener(this);
 		statisticByOxygen.setOnClickListener(this);
+		
+		previous.setOnClickListener(this);
+		next.setOnClickListener(this);
 	}
 	
 	private void initVariables()
 	{
 		statisticType = new StatisticType();
 		statisticObject = new StatisticObject();
+		statisticDateTime = new StatisticDateTime();
+	}
+	
+	private void initUI()
+	{
+		updateSelectDateUI();
+	}
+	
+	@SuppressWarnings("deprecation")
+	private void updateSelectDateUI()
+	{
+		switch (statisticType.getStatisticType()) 
+		{
+		case StatisticType.STATISTIC_BY_DAY:
+			masterDate.setText(statisticDateTime.getYear() + "年 " + statisticDateTime.getMonth() + "月");
+			slaveDate.setText(statisticDateTime.isToday() ? "今天" : statisticDateTime.getDayOfMonth() + "日");
+			
+			Date previousDate = new Date(statisticDateTime.getYear() - 1900, 
+					statisticDateTime.getMonth() - 1, 
+					statisticDateTime.getDayOfMonth() + -1);
+			Date nextDate = new Date(statisticDateTime.getYear() - 1900, 
+					statisticDateTime.getMonth() - 1, 
+					statisticDateTime.getDayOfMonth() + 1);
+			
+			previous.setText(previousDate.getDate() + "号");
+			next.setText(nextDate.getDate() + "号");
+			break;
+		case StatisticType.STATISTIC_BY_MONTH:
+			masterDate.setText(statisticDateTime.getYear() + "年");
+			slaveDate.setText(statisticDateTime.getMonth() + "月");
+			
+			int previousMonth = statisticDateTime.getMonth() - 1;
+			previousMonth = previousMonth < 1 ? 12 : previousMonth;
+			int nextMonth = statisticDateTime.getMonth() + 1;
+			nextMonth = nextMonth > 12 ? 1 : nextMonth;
+			
+			previous.setText(previousMonth + "月");
+			next.setText(nextMonth + "月");
+			break;
+		case StatisticType.STATISTIC_BY_YEAR:
+			masterDate.setText("");
+			slaveDate.setText(statisticDateTime.getYear() + "年");
+			
+			previous.setText((statisticDateTime.getYear() - 1) + "年");
+			next.setText((statisticDateTime.getYear() + 1) + "年");
+			break;
+		default:
+			break;
+		}
 	}
 	
 	@Override
@@ -120,12 +188,15 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		
 		case R.id.frg_date_selection_day:
 			onDaySelect();
+			updateSelectDateUI();
 			break;
 		case R.id.frg_date_selection_month:
 			onMonthSelect();
+			updateSelectDateUI();
 			break;
 		case R.id.frg_date_selection_year:
 			onYearSelect();
+			updateSelectDateUI();
 			break;
 		
 		case R.id.frg_object_blood_pressure:
@@ -137,11 +208,64 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		case R.id.frg_object_oxygen:
 			onOxygenSelect();
 			break;
+			
+
+		case R.id.frg_previous:
+			updateSelectDate(-1);
+			updateSelectDateUI();
+			break;
+		case R.id.frg_next:
+			updateSelectDate(1);
+			updateSelectDateUI();
+			break;
 		default:
 			break;
 		}
 	}
 	
+	@SuppressWarnings("deprecation")
+	private void updateSelectDate(int increment)
+	{
+		switch (statisticType.getStatisticType())
+		{
+		case StatisticType.STATISTIC_BY_DAY:
+			Date date = new Date(statisticDateTime.getYear() - 1900, 
+					statisticDateTime.getMonth() - 1, 
+					statisticDateTime.getDayOfMonth() + increment);
+			
+			statisticDateTime.setYear(date.getYear() + 1900);
+			statisticDateTime.setMonth(date.getMonth() + 1);
+			statisticDateTime.setDayOfMonth(date.getDate());
+			break;
+		case StatisticType.STATISTIC_BY_MONTH:
+			int year = statisticDateTime.getYear();
+			int month = statisticDateTime.getMonth() + increment;
+			int dayOfMonth = statisticDateTime.getDayOfMonth();
+			
+			if (month < 1)
+			{
+				year--;
+				month = 12;
+				dayOfMonth = 31;
+			}
+			else if(month > 12)
+			{
+				year++;
+				month = 1;
+				dayOfMonth = 1;
+			}
+			statisticDateTime.setYear(year);
+			statisticDateTime.setMonth(month);
+			statisticDateTime.setDayOfMonth(dayOfMonth);
+			break;
+		case StatisticType.STATISTIC_BY_YEAR:
+			statisticDateTime.setYear(statisticDateTime.getYear() + increment);
+			break;
+
+		default:
+			break;
+		}
+	}
 	
 	public void onDaySelect()
 	{
@@ -151,25 +275,6 @@ public class FragmentTrend extends BaseFragment implements OnClickListener
 		statisticByDay.setBackgroundColor(Color.LTGRAY);
 		statisticByMonth.setBackgroundColor(Color.WHITE);
 		statisticByYear.setBackgroundColor(Color.WHITE);
-		
-		JSONObject jsonObj = new JSONObject();
-		try
-		{
-			jsonObj.put(StatisticDateTime.YEAR, 2015);
-			jsonObj.put(StatisticDateTime.MONTH, 06);
-			jsonObj.put(StatisticDateTime.DAY_OF_MONTH, 17);
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		
-		DatabaseConverter.getInstance().getDataFromDB(1, 1, jsonObj, new RetriveDataListener()
-		{
-			@Override
-			public void onFinishRetrivingData(String filePath) 
-			{
-				System.out.println("Got data.");
-			}
-		});
 	}
 	
 	public void onMonthSelect()
