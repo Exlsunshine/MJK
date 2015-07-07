@@ -418,6 +418,6 @@ public class DatabaseConverter
 		int minute = calendar.get(Calendar.MINUTE);
 		int second = calendar.get(Calendar.SECOND);
 		
-		return String.format("%d-%d-%d\t%d:%d:%d", year, month == 0 ? 12 : month, dayOfMonth, hour, minute, second);
+		return String.format("%d-%d-%d\t%d:%d:%d", year, month + 1, dayOfMonth, hour, minute, second);
 	}
 }
